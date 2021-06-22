@@ -5,17 +5,17 @@ defined('TYPO3_MODE') or die();
     'BeechIt.FalSecuredownload',
     'Filetree',
     [
-        BeechIt\FalSecuredownload\Controller\FileTreeController::class => 'tree',
+        'FileTree' => 'tree',
     ],
     // non-cacheable actions
     [
-        BeechIt\FalSecuredownload\Controller\FileTreeController::class => 'tree',
+        'FileTree' => 'tree',
     ]
 );
 
 // FE FileTree leaf open/close state dispatcher
 $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['FalSecuredownloadFileTreeState'] =
-    \BeechIt\FalSecuredownload\Controller\FileTreeStateController::class . '::saveLeafState';
+    'EXT:fal_securedownload/Resources/Public/Php/FileTreeState.php';
 
 // FileDumpEID hook
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['FileDumpEID.php']['checkFileAccess']['FalSecuredownload'] =
@@ -119,4 +119,14 @@ if (TYPO3_MODE === 'BE') {
             'class' => \BeechIt\FalSecuredownload\FormEngine\DownloadStatistics::class,
         ];
     }
+    
+    if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('solr_file_indexer')) {
+        // ext:solr_file_indexer
+        $signalSlotDispatcher->connect(
+            \HMMH\SolrFileIndexer\Indexer\FileIndexer::class,
+            'addContentAfter',
+            \BeechIt\FalSecuredownload\Aspects\SolrFileIndexerAspect::class,
+            'postAddContent'
+        );
+    }                                                                                         
 }
