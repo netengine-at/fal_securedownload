@@ -26,6 +26,7 @@ $EM_CONF[$_EXTKEY] = [
         'suggests' => [
             'ke_search' => '1.8.4',
             'solrfal' => '4.1.0',
+            'solr_file_indexer' => '2.2.0',
         ],
     ],
 ];
