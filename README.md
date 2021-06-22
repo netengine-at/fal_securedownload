@@ -29,3 +29,4 @@ The access to assets can be set on folder/file bases by setting access to fe_gro
 ### Suggestions
 - EXT:ke_search v1.8.4
 - EXT:solrfal v4.1.0
+- EXT:solr_file_indexer v2.2.0
