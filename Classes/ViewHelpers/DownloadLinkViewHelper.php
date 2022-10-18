@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\ViewHelpers;
+namespace Netengine\FalSecuredownload\ViewHelpers;
 
 /***************************************************************
  *  Copyright notice

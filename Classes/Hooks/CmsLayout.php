@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Hooks;
+namespace Netengine\FalSecuredownload\Hooks;
 
 /***************************************************************
  *  Copyright notice
@@ -23,7 +23,7 @@ namespace BeechIt\FalSecuredownload\Hooks;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -37,20 +37,10 @@ class CmsLayout
      */
     protected $resourceFactory;
 
-    /**
-     * @param ResourceFactory $resourceFactory
-     */
     public function __construct(ResourceFactory $resourceFactory = null)
     {
         $this->resourceFactory = $resourceFactory ?? GeneralUtility::makeInstance(ResourceFactory::class);
     }
-
-    /**
-     * Table information
-     *
-     * @var array
-     */
-    public $tableData = [];
 
     /**
      * Flexform information
@@ -67,6 +57,7 @@ class CmsLayout
      */
     public function getExtensionSummary(array $params)
     {
+        $tableData = [];
         $result = '<u><strong>' . $this->sL('plugin.title') . '</strong></u>';
 
         if ($params['row']['list_type'] === 'falsecuredownload_filetree') {
@@ -81,7 +72,7 @@ class CmsLayout
             }
 
             if ($storageName) {
-                $this->tableData[] = [
+                $tableData[] = [
                     $this->sL('flexform.storage'),
                     $storageName
                 ];
@@ -89,12 +80,12 @@ class CmsLayout
 
             // Folder
             $folder = $this->getFieldFromFlexform('settings.folder');
-            $this->tableData[] = [
+            $tableData[] = [
                 $this->sL('flexform.folder'),
                 $folder
             ];
 
-            $result .= $this->renderSettingsAsTable();
+            $result .= $this->renderSettingsAsTable($tableData);
             $result = '<div style="background-color:#f1f1f1; padding:8px; margin-top:8px" class="t3-page-ce-info">' . $result . '</div>';
         }
 
@@ -105,16 +96,17 @@ class CmsLayout
      * Render the settings as table for Web>Page module
      * System settings are displayed in mono font
      *
+     * @param array $tableData
      * @return string
      */
-    protected function renderSettingsAsTable()
+    protected function renderSettingsAsTable(array $tableData)
     {
-        if (count($this->tableData) == 0) {
+        if (count($tableData) == 0) {
             return '';
         }
 
         $content = '';
-        foreach ($this->tableData as $line) {
+        foreach ($tableData as $line) {
             $content .= '<tr><td><em><strong>' . $line[0] . '</strong></em></td><td>&nbsp; ' . ' ' . $line[1] . '</td></tr>';
         }
 
@@ -158,7 +150,7 @@ class CmsLayout
     }
 
     /**
-     * @return \TYPO3\CMS\Lang\LanguageService
+     * @return LanguageService
      */
     protected function getLangService()
     {

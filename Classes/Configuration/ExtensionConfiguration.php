@@ -23,7 +23,7 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-namespace BeechIt\FalSecuredownload\Configuration;
+namespace Netengine\FalSecuredownload\Configuration;
 
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as ExtensionConfigurationCore;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

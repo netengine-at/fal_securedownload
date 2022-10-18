@@ -4,30 +4,61 @@ services:
     autoconfigure: true
     public: false
 
-  BeechIt\FalSecuredownload\:
+  Netengine\FalSecuredownload\:
     resource: '../Classes/*'
 
-  BeechIt\FalSecuredownload\Hooks\DocHeaderButtonsHook:
+  Netengine\FalSecuredownload\Hooks\DocHeaderButtonsHook:
     public: true
 
-  BeechIt\FalSecuredownload\Controller\BePublicUrlController:
+  Netengine\FalSecuredownload\Controller\BePublicUrlController:
     public: true
 
-  BeechIt\FalSecuredownload\Controller\FileTreeController:
+  Netengine\FalSecuredownload\Controller\FileTreeController:
     public: true
 
-  BeechIt\FalSecuredownload\Hooks\CmsLayout:
+  Netengine\FalSecuredownload\Hooks\CmsLayout:
     public: true
 
-  BeechIt\FalSecuredownload\Service\LeafStateService:
+  Netengine\FalSecuredownload\Service\LeafStateService:
     public: true
 
-  BeechIt\FalSecuredownload\ContextMenu\ItemProvider:
+  Netengine\FalSecuredownload\ContextMenu\ItemProvider:
     public: true
     arguments:
       $table: ''
       $identifier: ''
       $context: ''
 
-  BeechIt\FalSecuredownload\Middleware\FileTreeState:
+  Netengine\FalSecuredownload\Middleware\FileTreeState:
     public: true
+
+  Netengine\FalSecuredownload\EventListener\FolderChangedEventListener:
+    tags:
+      - name: event.listener
+        method: 'preFolderMove'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderMovedEvent
+      - name: event.listener
+        method: 'postFolderMove'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFolderMovedEvent
+      - name: event.listener
+        method: 'preFolderDelete'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderDeletedEvent
+      - name: event.listener
+        method: 'postFolderDelete'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFolderDeletedEvent
+      - name: event.listener
+        method: 'preFolderRename'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderRenamedEvent
+      - name: event.listener
+        method: 'postFolderRename'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFolderRenamedEvent
+
+  Netengine\FalSecuredownload\EventListener\ModifyIconForResourcePropertiesEventListener:
+    tags:
+      - name: event.listener
+        event: TYPO3\CMS\Core\Imaging\Event\ModifyIconForResourcePropertiesEvent
+
+  Netengine\FalSecuredownload\EventListener\GeneratePublicUrlForResourceEventListener:
+    tags:
+      - name: event.listener
+        event: TYPO3\CMS\Core\Resource\Event\GeneratePublicUrlForResourceEvent

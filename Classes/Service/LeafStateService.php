@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Service;
+namespace Netengine\FalSecuredownload\Service;
 
 /***************************************************************
  *  Copyright notice
@@ -39,9 +39,6 @@ class LeafStateService implements SingletonInterface
      */
     protected $resourceFactory;
 
-    /**
-     * @param ResourceFactory $resourceFactory
-     */
     public function __construct(ResourceFactory $resourceFactory = null)
     {
         $this->resourceFactory = $resourceFactory ?? GeneralUtility::makeInstance(ResourceFactory::class);
@@ -50,7 +47,6 @@ class LeafStateService implements SingletonInterface
     /**
      * Save new leave state in user session
      *
-     * @param FrontendUserAuthentication $user
      * @param string $folder
      * @param bool $open
      */
@@ -74,7 +70,6 @@ class LeafStateService implements SingletonInterface
     /**
      * Get leaf state from user session
      *
-     * @param FrontendUserAuthentication $user
      * @param string $folder
      * @return bool
      */
@@ -87,12 +82,11 @@ class LeafStateService implements SingletonInterface
     /**
      * Get leaf states from user session
      *
-     * @param FrontendUserAuthentication $user
      * @return array|mixed
      */
     protected function getFolderState(FrontendUserAuthentication $user)
     {
-        $folderStates = $user->getKey($user->user['uid'] ? 'user' : 'ses', 'LeafStateService');
+        $folderStates = $user->getKey(empty($user->user['uid']) ? 'ses' : 'user', 'LeafStateService');
         if ($folderStates) {
             $folderStates = unserialize($folderStates);
         }
@@ -104,9 +98,6 @@ class LeafStateService implements SingletonInterface
 
     /**
      * Save leaf states in user session
-     *
-     * @param FrontendUserAuthentication $user
-     * @param array $folderState
      */
     protected function saveFolderState(FrontendUserAuthentication $user, array $folderState)
     {
@@ -114,3 +105,4 @@ class LeafStateService implements SingletonInterface
         $user->storeSessionData();
     }
 }
+h

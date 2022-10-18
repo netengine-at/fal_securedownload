@@ -1,6 +1,5 @@
 <?php
-
-namespace BeechIt\FalSecuredownload\Aspects;
+namespace Netengine\FalSecuredownload\Aspects;
 
 /**
  * This source file is proprietary property of Beech Applications B.V.
@@ -8,7 +7,7 @@ namespace BeechIt\FalSecuredownload\Aspects;
  * All code (c) Beech Applications B.V. all rights reserved
  */
 
-use BeechIt\FalSecuredownload\Security\CheckPermissions;
+use Netengine\FalSecuredownload\Security\CheckPermissions;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;

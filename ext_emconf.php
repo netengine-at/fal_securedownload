@@ -11,22 +11,17 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Frans Saris (Beech.it)',
     'author_email' => 't3ext@beech.it',
     'author_company' => 'Beech.it',
-    'module' => '',
     'state' => 'stable',
-    'uploadfolder' => false,
-    'createDirs' => '',
-    'modify_tables' => '',
     'clearCacheOnLoad' => true,
-    'version' => '3.0.0',
+    'version' => '4.0.2',
     'constraints' => [
         'depends' => [
-            'typo3' => '10.4.6 - 10.4.99',
+            'typo3' => '11.5.0 - 11.5.99',
         ],
         'conflicts' => [],
         'suggests' => [
-            'ke_search' => '1.8.4',
-            'solrfal' => '4.1.0',
-            'solr_file_indexer' => '2.2.0',
+            'ke_search' => '4.3.1',
+            'solrfal' => '10.0.0',
         ],
     ],
 ];

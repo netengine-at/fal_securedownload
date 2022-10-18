@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Security;
+namespace Netengine\FalSecuredownload\Security;
 
 /***************************************************************
  *  Copyright notice
@@ -24,7 +24,15 @@ namespace BeechIt\FalSecuredownload\Security;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use BeechIt\FalSecuredownload\Service\Utility;
+use Netengine\FalSecuredownload\Events\AddCustomGroupsEvent;
+use Netengine\FalSecuredownload\Service\Utility;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\CMS\Backend\FrontendBackendUserAuthentication;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Authentication\Mfa\MfaRequiredException;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
@@ -51,17 +59,23 @@ class CheckPermissions implements SingletonInterface
     protected $checkFolderRootLineAccessCache = [];
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->utilityService = GeneralUtility::makeInstance(Utility::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Check file access for current FeUser
      *
-     * @param \TYPO3\CMS\Core\Resource\File $file
+     * @param File $file
      * @return bool
      */
     public function checkFileAccessForCurrentFeUser($file)
@@ -71,9 +85,59 @@ class CheckPermissions implements SingletonInterface
     }
 
     /**
+     * Check backend user file access
+     *
+     * @param File $file
+     * @return bool
+     */
+    public function checkBackendUserFileAccess(File $file): bool
+    {
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+        if (!$backendUser instanceof BackendUserAuthentication || empty($backendUser->user['uid'])) {
+            return false;
+        }
+        if ($backendUser->isAdmin()) {
+            return true;
+        }
+        $resourceStorage = $file->getStorage();
+        $resourceStorage->setUserPermissions($GLOBALS['BE_USER']->getFilePermissionsForStorage($resourceStorage));
+        foreach ($GLOBALS['BE_USER']->getFileMountRecords() as $fileMountRow) {
+            if ((int)$fileMountRow['base'] === (int)$resourceStorage->getUid()) {
+                try {
+                    $resourceStorage->addFileMount($fileMountRow['path'], $fileMountRow);
+                } catch (FolderDoesNotExistException $e) {
+                    // That file mount does not seem to be valid, fail silently
+                }
+            }
+        }
+        $originalEvaluatePermissions = $resourceStorage->getEvaluatePermissions();
+        $resourceStorage->setEvaluatePermissions(true);
+        $access = $resourceStorage->checkFileActionPermission('read', $file);
+        $resourceStorage->setEvaluatePermissions($originalEvaluatePermissions);
+        return $access;
+    }
+
+    /**
+     * Get backend user object
+     *
+     * @return FrontendBackendUserAuthentication
+     * @throws MfaRequiredException
+     */
+    protected function getBackendUser(): FrontendBackendUserAuthentication
+    {
+        $backendUserObject = GeneralUtility::makeInstance(FrontendBackendUserAuthentication::class);
+        $backendUserObject->start();
+        $backendUserObject->unpack_uc();
+        if (!empty($backendUserObject->user['uid'])) {
+            $backendUserObject->fetchGroupData();
+        }
+        return $backendUserObject;
+    }
+
+    /**
      * Check file access for given FeGroups combination
      *
-     * @param \TYPO3\CMS\Core\Resource\File $file
+     * @param File $file
      * @param bool|array $userFeGroups FALSE = no login, array() fe groups of user
      * @return bool
      */
@@ -85,10 +149,10 @@ class CheckPermissions implements SingletonInterface
         }
 
         $customUserGroups = [];
-        /** @var Dispatcher $signalSlotDispatcher */
-        $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
-        $signalArguments = $signalSlotDispatcher->dispatch(__CLASS__, 'AddCustomGroups', [$customUserGroups]);
-        $customUserGroups = array_shift($signalArguments);
+        /** @var AddCustomGroupsEvent $event */
+        $event = $this->eventDispatcher->dispatch(new AddCustomGroupsEvent([$customUserGroups]));
+        $eventArguments = $event->getCustomUserGroups();
+        $customUserGroups = array_shift($eventArguments);
 
         if (is_array($userFeGroups)) {
             $userFeGroups = array_unique(array_merge($userFeGroups, $customUserGroups));
@@ -114,7 +178,6 @@ class CheckPermissions implements SingletonInterface
     /**
      * Check if given FeGroups have enough rights to access given folder
      *
-     * @param Folder $folder
      * @param bool|array $userFeGroups FALSE = no login, array() is the groups of the user
      * @return bool
      */
@@ -148,7 +211,6 @@ class CheckPermissions implements SingletonInterface
     /**
      * Get permissions set on folder (no root line check)
      *
-     * @param FolderInterface $folder
      * @return bool|string FALSE or comma separated list of fe_group uids
      */
     public function getFolderPermissions(FolderInterface $folder)
@@ -164,7 +226,6 @@ class CheckPermissions implements SingletonInterface
     /**
      * Get FeGroups that are allowed to view a file/folder (checks full rootline)
      *
-     * @param ResourceInterface $resource
      * @return string
      */
     public function getPermissions(ResourceInterface $resource)
@@ -173,35 +234,32 @@ class CheckPermissions implements SingletonInterface
         $resource->getStorage()->setEvaluatePermissions(false);
 
         $feGroups = [];
-        // Check file record for permissions
-        if ($resource instanceof File && $resource->getProperty('fe_groups')) {
-            $feGroups = GeneralUtility::intExplode(',', $resource->getProperty('fe_groups'), true);
-        }
+        // loop trough the root line of an folder and check the permissions of every folder
+        foreach ($this->getFolderRootLine($resource->getParentFolder()) as $folder) {
+            // fetch folder permissions record
+            $folderRecord = $this->utilityService->getFolderRecord($folder);
 
-        // If file record does not have permissions set, check folders
-        if ($feGroups === []) {
-            $folders = array_reverse($this->getFolderRootLine($resource->getParentFolder()));
-            foreach ($folders as $folder) {
-                $folderRecord = $this->utilityService->getFolderRecord($folder);
-                if ($folderRecord && !empty($folderRecord['fe_groups'])) {
-                    $feGroups = GeneralUtility::intExplode(',', $folderRecord['fe_groups'], true);
-
-                    if ($feGroups !== []) {
-                        break;
-                    }
+            // if record found check permissions
+            if ($folderRecord) {
+                if ($feGroups === []) {
+                    $feGroups = GeneralUtility::trimExplode(',', $folderRecord['fe_groups'], true);
                 }
+                if ($folderRecord['fe_groups']) {
+                    $feGroups = ArrayUtility::keepItemsInArray($feGroups, $folderRecord['fe_groups']);
+                }
+                break;
             }
         }
-
+        if ($resource instanceof File && $resource->getProperty('fe_groups')) {
+            $feGroups = ArrayUtility::keepItemsInArray($feGroups, $resource->getProperty('fe_groups'));
+        }
         $resource->getStorage()->setEvaluatePermissions($currentPermissionsCheck);
-        
         return implode(',', $feGroups);
     }
 
     /**
      * Get all folders in root line of given folder
      *
-     * @param FolderInterface $folder
      * @return Folder[]
      */
     public function getFolderRootLine(FolderInterface $folder)
@@ -243,7 +301,7 @@ class CheckPermissions implements SingletonInterface
         }
 
         // enabled for all loggedIn Users
-        if (strpos($groups, '-2') !== false) {
+        if (str_contains($groups, '-2')) {
             return true;
         }
 

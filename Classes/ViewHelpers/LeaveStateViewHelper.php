@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\ViewHelpers;
+namespace Netengine\FalSecuredownload\ViewHelpers;
 
 /***************************************************************
  *  Copyright notice
@@ -24,16 +24,19 @@ namespace BeechIt\FalSecuredownload\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use BeechIt\FalSecuredownload\Service\LeafStateService;
+use Netengine\FalSecuredownload\Service\LeafStateService;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractConditionViewHelper;
+use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper;
 
 /**
  * Class LeaveStateViewHelper
+ *
+ * @package Netengine\FalSecuredownload\ViewHelpers
  */
 class LeaveStateViewHelper extends AbstractConditionViewHelper
 {
+
     public function initializeArguments()
     {
         parent::initializeArguments();

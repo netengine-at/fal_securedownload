@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Hooks;
+namespace Netengine\FalSecuredownload\Hooks;
 
 /***************************************************************
  *  Copyright notice
@@ -23,7 +23,7 @@ namespace BeechIt\FalSecuredownload\Hooks;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use BeechIt\FalSecuredownload\Security\CheckPermissions;
+use Netengine\FalSecuredownload\Security\CheckPermissions;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;

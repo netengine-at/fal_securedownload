@@ -1,6 +1,6 @@
 <?php
 
-namespace BeechIt\FalSecuredownload\Controller;
+namespace Netengine\FalSecuredownload\Controller;
 
 /***************************************************************
  *  Copyright notice
@@ -25,7 +25,7 @@ namespace BeechIt\FalSecuredownload\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use BeechIt\FalSecuredownload\Service\LeafStateService;
+use Netengine\FalSecuredownload\Service\LeafStateService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;

@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\ViewHelpers\Security;
+namespace Netengine\FalSecuredownload\ViewHelpers\Security;
 
 /***************************************************************
  *  Copyright notice
@@ -66,8 +66,8 @@ class AssetAccessViewHelper extends AbstractConditionViewHelper
         /** @var File $file */
         $file = $arguments['file'];
 
-        /** @var $checkPermissionsService \BeechIt\FalSecuredownload\Security\CheckPermissions */
-        $checkPermissionsService = GeneralUtility::makeInstance('BeechIt\\FalSecuredownload\\Security\\CheckPermissions');
+        /** @var $checkPermissionsService \Netengine\FalSecuredownload\Security\CheckPermissions */
+        $checkPermissionsService = GeneralUtility::makeInstance('Netengine\\FalSecuredownload\\Security\\CheckPermissions');
         $userFeGroups = self::getFeUserGroups();
         $access = false;
 

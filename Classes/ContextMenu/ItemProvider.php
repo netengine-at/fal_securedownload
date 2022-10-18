@@ -1,6 +1,6 @@
 <?php
 
-namespace BeechIt\FalSecuredownload\ContextMenu;
+namespace Netengine\FalSecuredownload\ContextMenu;
 
 /*
  * This source file is proprietary property of Beech Applications B.V.
@@ -8,7 +8,7 @@ namespace BeechIt\FalSecuredownload\ContextMenu;
  * All code (c) Beech Applications B.V. all rights reserved
  */
 
-use BeechIt\FalSecuredownload\Service\Utility;
+use Netengine\FalSecuredownload\Service\Utility;
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -24,9 +24,6 @@ class ItemProvider extends AbstractProvider
 
     /**
      * ItemProvider constructor.
-     * @param string $table
-     * @param string $identifier
-     * @param string $context
      * @param ResourceFactory|null $resourceFactory
      */
     public function __construct(string $table, string $identifier, string $context = '', ResourceFactory $resourceFactory = null)
@@ -40,17 +37,11 @@ class ItemProvider extends AbstractProvider
      */
     protected $folder;
 
-    /**
-     * @return int
-     */
     public function getPriority(): int
     {
         return 90;
     }
 
-    /**
-     * @return bool
-     */
     public function canHandle(): bool
     {
         return $this->table === 'sys_file' || $this->table === 'sys_file_storage';
@@ -79,9 +70,6 @@ class ItemProvider extends AbstractProvider
 
     /**
      * Adds the folder permission menu item for folder of a non-public storage
-     *
-     * @param array $items
-     * @return array
      */
     public function addItems(array $items): array
     {
@@ -102,10 +90,6 @@ class ItemProvider extends AbstractProvider
         return $items;
     }
 
-    /**
-     * @param string $itemName
-     * @return array
-     */
     protected function getAdditionalAttributes(string $itemName): array
     {
         /** @var Utility $utility */

@@ -15,7 +15,7 @@ declare(strict_types = 1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace BeechIt\FalSecuredownload\Context;
+namespace Netengine\FalSecuredownload\Context;
 
 use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 use TYPO3\CMS\Core\Context\AspectInterface;
@@ -44,9 +44,6 @@ class UserAspect implements AspectInterface
         $this->user = $user ?? $this->createPseudoUser();
     }
 
-    /**
-     * @return object
-     */
     private function createPseudoUser(): object
     {
         $user = new \stdClass();

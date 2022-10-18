@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Aspects;
+namespace Netengine\FalSecuredownload\Aspects;
 
 /***************************************************************
  *  Copyright notice
@@ -24,7 +24,7 @@ namespace BeechIt\FalSecuredownload\Aspects;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use BeechIt\FalSecuredownload\Security\CheckPermissions;
+use Netengine\FalSecuredownload\Security\CheckPermissions;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceInterface;

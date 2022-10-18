@@ -1,5 +1,5 @@
 <?php
-namespace BeechIt\FalSecuredownload\Hooks;
+namespace Netengine\FalSecuredownload\Hooks;
 
 /***************************************************************
  *  Copyright notice
