@@ -1,4 +1,4 @@
-FAL SecureDownLoad
+FAL SecureDownLoad (extended for the Extension solr_file_indexer)
 ===
 
 This extension (fal_securedownload) aims to be a general solution to secure your assets.
@@ -21,7 +21,7 @@ The access to assets can be set on folder/file bases by setting access to fe_gro
 - Let editor set permissions in file list
 - Force download for all files (for protected file storages)
 - Force download for specific file extensions (for protected file storages)
-- Keep track of requested downloads (count downloads per user and file)
+- Keep track of requested downloads (count downloads per user and file) 
 
 ### Requirements
 - TYPO3 8 LTS or TYPO3 9 LTS
